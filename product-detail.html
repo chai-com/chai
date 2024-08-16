@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品詳細資訊</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="product-detail-container">
+        <div class="product-detail">
+            <img id="product-image" src="" alt="">
+            <div class="product-info">
+                <h2 id="product-name"></h2>
+                <div id="quantity-control" class="quantity-control">
+                    <!-- 尺寸和數量控制會由 JavaScript 動態生成 -->
+                </div>
+                <button onclick="updateTotalQuantities()">確定</button>
+                <a href="index.html" class="back-button">返回主頁</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        let totalQuantities = {
+            '5mm': 0,
+            '8mm': 0,
+            '18mm': 0,
+            '25mm': 0    
+        };
+
+        function updateTotalQuantities() {
+            // 更新每种尺寸的总数量
+            Object.keys(totalQuantities).forEach(size => {
+                const increaseInput = document.getElementById(`increase-input-${size}`);
+                const decreaseInput = document.getElementById(`decrease-input-${size}`);
+
+                // 确保输入框存在
+                if (increaseInput && decreaseInput) {
+                    const increaseValue = parseInt(increaseInput.value) || 0;
+                    const decreaseValue = parseInt(decreaseInput.value) || 0;
+
+                    totalQuantities[size] += increaseValue - decreaseValue;
+
+                    // 确保总数量不为负数
+                    if (totalQuantities[size] < 0) totalQuantities[size] = 0;
+
+                    // 更新页面显示的总数量
+                    document.getElementById(`total-quantity-${size}`).textContent = totalQuantities[size];
+
+                    // 重置输入框
+                    increaseInput.value = 0;
+                    decreaseInput.value = 0;
+                }
+            });
+        }
+
+        function initializeProductDetails() {
+            // 从 URL 参数提取商品详细信息
+            const params = new URLSearchParams(window.location.search);
+            const productName = params.get('name');
+            const productImage = params.get('image');
+            const availableSizes = params.get('sizes')?.split(',') || [];
+
+            document.getElementById('product-name').textContent = productName;
+            document.getElementById('product-image').src = `images/${productImage}.jpg`;
+
+            const quantityControl = document.getElementById('quantity-control');
+            quantityControl.innerHTML = ''; // 清空现有内容
+
+            availableSizes.forEach(size => {
+                const sizeControl = document.createElement('div');
+                sizeControl.classList.add('control-group');
+                sizeControl.innerHTML = `
+                    <label for="increase-input-${size}">${size} 增加 (+):</label>
+                    <input type="number" id="increase-input-${size}" value="0" min="0">
+                    <label for="decrease-input-${size}">${size} 減少 (-):</label>
+                    <input type="number" id="decrease-input-${size}" value="0" min="0">
+                    <p>${size} 總數量: <span id="total-quantity-${size}">0</span></p>
+                `;
+                quantityControl.appendChild(sizeControl);
+
+                // 初始化总数量
+                totalQuantities[size] = 0;
+            });
+        }
+
+        // 初始化商品详细信息
+        window.onload = initializeProductDetails;
+    </script>
+</body>
+</html>

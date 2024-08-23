@@ -93,7 +93,7 @@
                         <div class="product">
                             <img src="images/A-224.jpg" alt="A-224 七星灰礦岩">
                             <div class="product-details">
-                                <h3>A-224 七星灰礦岩</h3>
+                                    <h3>A-224 七星灰礦岩</h3>
                                 <div class="size-quantity">
                                     <p>8mm  總數量: <span>0</span></p>
                                     <p>18mm 總數量: <span>0</span></p>
@@ -885,9 +885,20 @@
                             </div>
                         </a>
                     `;    
-            }
-            document.getElementById('product-details').innerHTML = content;
+                }
+
+document.getElementById('product-details').innerHTML = content;
+
+// 更新每個板材的總數量顯示
+products[grade].forEach(product => {
+    ['8mm', '18mm', '25mm'].forEach(size => {
+        const storedQuantity = localStorage.getItem(`total-quantity-${product.image}-${size}`);
+        if (storedQuantity) {
+            document.getElementById(`total-quantity-${product.image}-${size}`).textContent = storedQuantity;
         }
-    </script>
+    });
+});
+}
+</script>
 </body>
 </html>
